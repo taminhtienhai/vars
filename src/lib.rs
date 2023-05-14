@@ -1,3 +1,6 @@
+mod core;
+mod tuple;
+
 /// Add one number to a another given number
 /// 
 /// Example
