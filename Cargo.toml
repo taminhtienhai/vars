@@ -8,11 +8,21 @@ license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[workspace]
+members = ["vars_macro"]
 
+[dependencies]
+vars_macro = { path = "./vars_macro" }
+
+[[bench]]
+name = "simple_bench"
+harness = false
 
 [profile.dev]
 opt-level = 1
 
 [profile.release]
 opt-level = 3
+
+[dev-dependencies]
+criterion = "0.5.1"
