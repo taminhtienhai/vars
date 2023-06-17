@@ -2,6 +2,9 @@
 name = "vars_macro"
 version = "0.1.0"
 edition = "2021"
+authors = ["harris_ta"]
+description = "marco helper"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
