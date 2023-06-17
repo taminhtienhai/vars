@@ -12,7 +12,7 @@ license = "MIT"
 members = ["vars_macro"]
 
 [dependencies]
-vars_macro = { path = "./vars_macro" }
+vars_macro = { version = "*" }
 
 [[bench]]
 name = "simple_bench"
