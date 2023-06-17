@@ -1,9 +1,11 @@
+#![no_std]
+
 mod core;
 mod tuple;
 mod hcons;
 
 pub use vars_macro::*;
-pub use self::{core::*, hcons::*};
+pub use self::{core::*, hcons::*, tuple::*};
 
 /// Add one number to a another given number
 /// 
@@ -14,12 +16,6 @@ pub use self::{core::*, hcons::*};
 /// ```
 pub fn add(left: usize, right: usize) -> usize {
     left + right
-}
-
-#[macro_export]
-macro_rules! count_tokens {
-    () => { 0 };
-    ($_:tt $($tail:tt) *) => { 1 + count_tokens![$($tail) *] };
 }
 
 #[cfg(test)]
@@ -35,8 +31,6 @@ mod tests {
     #[test]
     fn uncons() {
         let tup = (1,2,3).uncons();
-
-        println!("{tup:?}");
     }
 
     #[test]
@@ -57,7 +51,8 @@ mod tests {
     #[test]
     fn variadic_function() {
         fn accept_vars(v: impl Vars<usize>) {
-            let r = v.into_hcons();
+            // let r = v.into_hcons();
+
         }
 
         let a = (1,2,3).uncons();
@@ -69,13 +64,6 @@ mod tests {
     fn pop_front() {
         #[derive(Debug)]
         struct CnC(usize);
-        // let t = (CnC(2),CnC(3),CnC(4),);
-
-        // let r = t.pop_front();
-
-        // println!("{r:?}");
-
-        // println!("{t:?}");
 
         let mut tup: (usize, usize,) = (1,2,);
 
@@ -85,8 +73,6 @@ mod tests {
 
         r.1 = v;
 
-        println!("{:?}", r);
-
         fn consume(t: (usize, (usize, ))) {
 
         }
@@ -94,13 +80,24 @@ mod tests {
         // consume(r.owned());
 
         let u_8: &usize = &10;
-
-        let own = u_8.to_owned();
     }
 
     #[test]
     fn hcons_test() {
-        let h = (1,2,).into_hcons();
+        let h = (1,2,);
+
+        fn into_hcons(v: impl Vars<usize>) {
+            let (l1, r1) = v.uncons();
+            let (l2, r2) = r1.uncons();
+            let (l3, r3) = r2.uncons();
+
+            // println!("{:?}, {:?}", l1, l2);
+
+            let (a1, a2) = (1, "str").uncons();
+
+        }
+
+        into_hcons(h);
 
         // let (a, b) = h.uncons();
         // let (c, d) = b.uncons();

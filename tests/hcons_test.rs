@@ -1,14 +1,19 @@
 // use std::{marker::PhantomData, ops::Deref};
 
-use std::marker::PhantomData;
+use core::{marker::PhantomData};
 
 use vars::UnCons;
 
 #[derive(Default)]
 struct HEmpty<T> {
-    _phantom: std::marker::PhantomData<T>,
+    _phantom: core::marker::PhantomData<T>,
 }
 struct HCons<L, R: HNext<L>>(L, R);
+
+struct HConsIterator<V,R: UnCons<V>> {
+    pub current: V,
+    pub rest: R,
+}
 
 trait HNext<T> {
     type Next: HNext<T>;
@@ -24,9 +29,24 @@ trait IntoHCons<L, R: HNext<L>> {
 
 trait Vars<T>: HNext<T> + IntoHCons<T, Self::Cons> {
     type Cons: HNext<T>;
-    // type Output: HNext<T>;
-    // fn into_hcons(self) -> Self::Output;
 }
+
+// impl <L,R:HNext<L, Next = R>> UnCons<L> for HCons<L,R> {
+//     type NextIt = L;
+//     type Tail = <R as HNext<L>>::Next;
+
+//     fn uncons(self) -> (Option<L>, Self::Tail) {
+//         (Some(self.0), self.1)
+//     }
+// }
+
+// impl <T> UnCons<T> for HEmpty<T> {
+//     type Tail = HEmpty<T>;
+
+//     fn uncons(self) -> (Option<T>, Self::Tail) {
+//         (None, HEmpty { _phantom: PhantomData::default() })
+//     }
+// }
 
 // : IntoHCons<T, HCons<T, HEmpty<T>>> + IntoHCons<T, HCons<T,HCons<T, HEmpty<T>>>>{
 
@@ -158,6 +178,43 @@ impl<T, E: HNext<T>> HNext<T> for HCons<T, E> {
         self.1
     }
 }
+
+
+// impl <V, T: UnCons<Head = V>> IntoIterator for HCons<V,T> {
+//     type Item = V;
+//     type IntoIter = HConsIterator<V,T>;
+
+//     fn into_iter(self) -> Self::IntoIter {
+//         todo!()
+//     }
+// }
+
+// impl <V, T: UnCons<Head = V>> Iterator for HConsIterator<V,T> {
+//     type Item = V;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         self.rest = self.rest.next();
+//         Some(self.current)
+//     }
+// }
+
+// impl From<(usize, usize,)> for HCons<usize, HCons<usize, HEmpty<usize>>> {
+//     fn from(value: (usize, usize,)) -> Self {
+//         let (v1, v2,) = value;
+//         HCons(v1, HCons(v2, HEmpty { _phantom: PhantomData::default() }))
+//     }
+// }
+
+
+
+
+// #[test]
+// fn tuple_into_hcons() {
+//     fn auto_convert(v: HCons<usize, HCons<usize, HEmpty<usize>>>) {
+//     }
+
+//     auto_convert((1,2,).into());
+// }
 
 #[test]
 fn hcons_init() {

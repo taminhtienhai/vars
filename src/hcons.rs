@@ -2,7 +2,7 @@
 pub struct HCons<L, R: HNext<L>>(pub L, pub R);
 
 pub struct HEmpty<T> {
-    pub _phantom: std::marker::PhantomData<T>,
+    pub _phantom: core::marker::PhantomData<T>,
 }
 
 pub trait HNext<T> {

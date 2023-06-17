@@ -1,22 +1,35 @@
+extern crate alloc;
+
+use core::mem::MaybeUninit;
+
+use alloc::rc::Rc;
+
 use crate::{HNext, UnCons};
+
+pub struct TupleIter<T> {
+    data: Rc<[MaybeUninit<T>]>,
+    cur: usize,
+}
+
+impl <T> Iterator for crate::TupleIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current_pos = self.cur;
+        if self.cur >= self.data.len() { return None; }
+        self.cur += 1;
+        Some(unsafe { self.data.get_unchecked(current_pos).assume_init_read() })
+    }
+}
 
 macro_rules! impl_trait_for_tuple {
     () => {};
     ($head:ident $($tails:ident)*) => {
         impl_trait_for_tuple!($($tails )*);
 
-        impl <$head, $($tails,)*> crate::Tuple for ($head, $($tails,)*) {}
+        // impl <$head, $($tails,)*> crate::Tuple for ($head, $($tails,)*) {}
 
-        impl <$head, $($tails,)*> crate::UnCons for ($head, $($tails,)*) {
-            type Head = $head;
-            type Tail = ($($tails,) *);
-
-            #[allow(non_snake_case)]
-            fn uncons(self) -> (Self::Head, Self::Tail) {
-                let (h, $($tails,) *) = self;
-                (h, ($($tails,) *))
-            }
-        }
+        crate::impl_uncons_for_tuple!($head, $($tails,)*);
 
         // impl <$head, $($tails,)*> crate::DerefTuple for (&$head, $(&$tails,)*) {
         //     type Output = ($head, $($tails,)*);
@@ -60,10 +73,20 @@ macro_rules! impl_trait_for_tuple {
 
         crate::impl_hnext_for_tuple!($head, $($tails,)*);
         crate::impl_into_hcons_for_tuple!($head, $($tails,)*);
+        crate::impl_iterator_for_tuple!($head, $($tails,)*);
     };
 }
 
-impl_trait_for_tuple!(T1 T2 T3 T4 T5 T6 T7 T8 T9 T10);
+impl_trait_for_tuple!(T1 T2 T3 T4);
+
+impl <T> UnCons<T> for () {
+    type NextIt = T;
+    type Tail = ();
+
+    fn uncons(self) -> (Option<T>, Self::Tail) {
+        (None, ())
+    }
+}
 
 
 impl<T> HNext<T> for () {
